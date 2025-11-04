@@ -5,67 +5,92 @@
   <title>ระบบเช็คชื่อนักเรียน</title>
   <style>
     body {
-      font-family: "Prompt", sans-serif;
-      background: #f7f7f7;
-      padding: 20px;
-    }
-    h1 {
+      font-family: "Sarabun", sans-serif;
       text-align: center;
-      color: #333;
+      margin-top: 50px;
+      background: #f7f9fb;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-    }
-    th, td {
+    input {
+      padding: 8px;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
+      margin: 5px;
     }
     button {
-      margin: 3px;
-      padding: 5px 12px;
+      margin: 8px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
       border: none;
-      border-radius: 6px;
+      color: white;
       cursor: pointer;
-      font-size: 14px;
     }
-    .มา { background-color: #a2f1a2; }
-    .ขาด { background-color: #f8a2a2; }
-    .สาย { background-color: #ffd88b; }
+    .btn-present { background-color: #4caf50; }
+    .btn-late { background-color: #ff9800; }
+    .btn-absent { background-color: #f44336; }
+    .btn-add { background-color: #2196f3; }
   </style>
 </head>
 <body>
-  <h1>ระบบเช็คชื่อนักเรียน</h1>
+  <h2>📋 ระบบเช็คชื่อนักเรียน</h2>
 
-  <table>
-    <tr>
-      <th>ชื่อ</th>
-      <th>สถานะ</th>
-    </tr>
-    <tr><td>สมชาย</td><td><button class="มา" onclick="submitStatus('สมชาย','มา')">มา</button><button class="สาย" onclick="submitStatus('สมชาย','สาย')">สาย</button><button class="ขาด" onclick="submitStatus('สมชาย','ขาด')">ขาด</button></td></tr>
-    <tr><td>สมหญิง</td><td><button class="มา" onclick="submitStatus('สมหญิง','มา')">มา</button><button class="สาย" onclick="submitStatus('สมหญิง','สาย')">สาย</button><button class="ขาด" onclick="submitStatus('สมหญิง','ขาด')">ขาด</button></td></tr>
-    <tr><td>กิตติ</td><td><button class="มา" onclick="submitStatus('กิตติ','มา')">มา</button><button class="สาย" onclick="submitStatus('กิตติ','สาย')">สาย</button><button class="ขาด" onclick="submitStatus('กิตติ','ขาด')">ขาด</button></td></tr>
-  </table>
+  <h3>เพิ่มรายชื่อนักเรียน</h3>
+  <input type="text" id="no" placeholder="เลขที่">
+  <input type="text" id="studentId" placeholder="รหัสประจำตัว">
+  <input type="text" id="newName" placeholder="ชื่อ-นามสกุล">
+  <button class="btn-add" onclick="addStudent()">เพิ่ม</button>
+
+  <hr style="margin:30px 0;">
+
+  <h3>เช็คชื่อ</h3>
+  <input type="text" id="name" placeholder="กรอกชื่อ">
+  <div>
+    <button class="btn-present" onclick="submitStatus('มา')">มา</button>
+    <button class="btn-late" onclick="submitStatus('สาย')">สาย</button>
+    <button class="btn-absent" onclick="submitStatus('ขาด')">ขาด</button>
+  </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAWXunzfg965tMh5-4knAKUrwWmmm6m0-uJp3mKkSl6IrOuKEyFHsaLSPZoijbk9pSMw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4Nvgc7kiHhDjRJxLA_nFDfts8HgFwQR0yYbsOOdYXyVZFvZY0ogNUkGiAGVRWJ3oLCw/exec";
 
-    function submitStatus(name, status) {
-      const params = new URLSearchParams();
-      params.append('name', name);
-      params.append('status', status);
+    // ฟังก์ชันเพิ่มนักเรียนใหม่
+    function addStudent() {
+      const no = document.getElementById("no").value.trim();
+      const studentId = document.getElementById("studentId").value.trim();
+      const name = document.getElementById("newName").value.trim();
+
+      if (!no || !studentId || !name) return alert("กรุณากรอกข้อมูลให้ครบ");
 
       fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
+        method: "POST",
+        body: new URLSearchParams({
+          action: "addStudent",
+          no,
+          studentId,
+          name
+        })
       })
       .then(res => res.text())
-      .then(txt => alert(`บันทึกสถานะของ ${name}: ${status}`))
-      .catch(err => alert("เกิดข้อผิดพลาด: " + err));
+      .then(msg => alert(msg))
+      .catch(() => alert("เกิดข้อผิดพลาดในการเพิ่มนักเรียน"));
+    }
+
+    // ฟังก์ชันบันทึกสถานะ มา/สาย/ขาด
+    function submitStatus(status) {
+      const name = document.getElementById("name").value.trim();
+      if (!name) return alert("กรุณากรอกชื่อก่อนเช็คชื่อ");
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+          action: "checkStatus",
+          name,
+          status
+        })
+      })
+      .then(res => res.text())
+      .then(msg => alert(msg))
+      .catch(() => alert("เกิดข้อผิดพลาดในการบันทึกสถานะ"));
     }
   </script>
 </body>
