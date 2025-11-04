@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบเช็คชื่อนักเรียน</title>
+  <style>
+    body {
+      font-family: "Prompt", sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    button {
+      margin: 3px;
+      padding: 5px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .มา { background-color: #a2f1a2; }
+    .ขาด { background-color: #f8a2a2; }
+    .สาย { background-color: #ffd88b; }
+  </style>
+</head>
+<body>
+  <h1>ระบบเช็คชื่อนักเรียน</h1>
+
+  <table>
+    <tr>
+      <th>ชื่อ</th>
+      <th>สถานะ</th>
+    </tr>
+    <tr><td>สมชาย</td><td><button class="มา" onclick="submitStatus('สมชาย','มา')">มา</button><button class="สาย" onclick="submitStatus('สมชาย','สาย')">สาย</button><button class="ขาด" onclick="submitStatus('สมชาย','ขาด')">ขาด</button></td></tr>
+    <tr><td>สมหญิง</td><td><button class="มา" onclick="submitStatus('สมหญิง','มา')">มา</button><button class="สาย" onclick="submitStatus('สมหญิง','สาย')">สาย</button><button class="ขาด" onclick="submitStatus('สมหญิง','ขาด')">ขาด</button></td></tr>
+    <tr><td>กิตติ</td><td><button class="มา" onclick="submitStatus('กิตติ','มา')">มา</button><button class="สาย" onclick="submitStatus('กิตติ','สาย')">สาย</button><button class="ขาด" onclick="submitStatus('กิตติ','ขาด')">ขาด</button></td></tr>
+  </table>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAWXunzfg965tMh5-4knAKUrwWmmm6m0-uJp3mKkSl6IrOuKEyFHsaLSPZoijbk9pSMw/exec";
+
+    function submitStatus(name, status) {
+      const params = new URLSearchParams();
+      params.append('name', name);
+      params.append('status', status);
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      })
+      .then(res => res.text())
+      .then(txt => alert(`บันทึกสถานะของ ${name}: ${status}`))
+      .catch(err => alert("เกิดข้อผิดพลาด: " + err));
+    }
+  </script>
+</body>
+</html>
